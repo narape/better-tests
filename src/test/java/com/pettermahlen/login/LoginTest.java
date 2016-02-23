@@ -7,9 +7,11 @@ import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 import com.spotify.apollo.request.RequestContexts;
-import com.spotify.apollo.test.StubClient;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Optional;
 
@@ -20,20 +22,26 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class LoginTest {
   private static final String URI_BASE = "http://localhost/login?";
 
   private Login login;
 
+  @Mock
   private Client client;
+
+  @Mock
+  private UserStore userStore;
 
   @Before
   public void setUp() throws Exception {
-    client = new StubClient();
-
-    FakeUserStore userStore = new FakeUserStore();
-    userStore.addUser(User.create("petter", "super-encrypted"));
+    when(userStore.findByName("petter"))
+        .thenReturn(Optional.of(User.create("petter", "super-encrypted")));
+    when(userStore.findByName("matti"))
+        .thenReturn(Optional.empty());
 
     login = new Login(userStore);
   }
