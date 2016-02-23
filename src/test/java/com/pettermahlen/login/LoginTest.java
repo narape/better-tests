@@ -1,10 +1,10 @@
 package com.pettermahlen.login;
 
 import com.google.common.collect.ImmutableMap;
-
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
+import com.spotify.apollo.Status;
 import com.spotify.apollo.request.RequestContexts;
 
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class LoginTest {
         client,
         ImmutableMap.<String, String>of());
 
-    assertThat(login.authenticate(requestContext), hasStatus(withCode(400)));
+    assertThat(login.authenticate(requestContext), hasStatus(withCode(Status.BAD_REQUEST)));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class LoginTest {
         client,
         ImmutableMap.<String, String>of());
 
-    assertThat(login.authenticate(requestContext), hasStatus(withCode(400)));
+    assertThat(login.authenticate(requestContext), hasStatus(withCode(Status.BAD_REQUEST)));
   }
 
   private RequestContext as(String userName, String password) {

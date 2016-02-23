@@ -3,6 +3,7 @@ package com.pettermahlen.login;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
+import com.spotify.apollo.Status;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import okio.ByteString;
@@ -35,7 +36,7 @@ public class ServiceStepdefs {
 
   @Then("^the result is \"([^\"]*)\"$")
   public void the_result_is(String result) throws Throwable {
-    assertThat(response, hasStatus(withCode(200)));
+    assertThat(response, hasStatus(withCode(Status.OK)));
     assertThat(response, hasPayload(withString(result)));
   }
 
