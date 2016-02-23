@@ -4,6 +4,7 @@ import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 import com.spotify.apollo.test.StubClient;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -16,11 +17,19 @@ import static org.hamcrest.CoreMatchers.endsWith;
 import static org.junit.Assert.assertEquals;
 
 public class RemoteUserStoreTest {
+
+  private StubClient client;
+  private RemoteUserStore store;
+
+  @Before
+  public void setUp() throws Exception {
+    client = new StubClient();
+    store = new RemoteUserStore(client);
+  }
+
   @Test
   public void shouldConvertRemoteResponseToUser() throws Exception {
     // Arrange
-    StubClient client = new StubClient();
-    RemoteUserStore store = new RemoteUserStore(client);
     client.respond(Response.forPayload(encodeUtf8(jsonRepresentation("matti", "pwd"))))
           .to(uri(endsWith("matti")));
 
@@ -33,8 +42,6 @@ public class RemoteUserStoreTest {
 
   @Test
   public void shouldConvert404ToEmpty() throws Exception {
-    StubClient client = new StubClient();
-    RemoteUserStore store = new RemoteUserStore(client);
     client.respond(Response.forStatus(Status.NOT_FOUND))
            .to(uri(endsWith("landen")));
 
@@ -45,8 +52,6 @@ public class RemoteUserStoreTest {
 
   @Test
   public void shouldReturnEmptyForOtherCodes() throws Exception {
-    StubClient client = new StubClient();
-    RemoteUserStore store = new RemoteUserStore(client);
     client.respond(Response.forStatus(Status.IM_A_TEAPOT))
           .to(any(Request.class));
 
