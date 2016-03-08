@@ -4,8 +4,11 @@ import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 import com.spotify.apollo.test.StubClient;
+import okio.ByteString;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Optional;
 
@@ -15,6 +18,7 @@ import static okio.ByteString.encodeUtf8;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RemoteUserStoreTest {
 
@@ -60,4 +64,36 @@ public class RemoteUserStoreTest {
     assertEquals(Optional.empty(), user);
   }
 
+  @Test
+  public void shouldPropagateExceptions_flavor1() throws Exception {
+    client.respond(Response.forPayload(ByteString.encodeUtf8("bad json")))
+          .to(any(Request.class));
+
+    try {
+      store.findByName("random-user");
+      fail("Exception expected");
+    } catch (RuntimeException e) {
+      // or we could insert assertions about the exceptions
+    }
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void shouldPropagateExceptions_flavor2() throws Exception {
+    client.respond(Response.forPayload(ByteString.encodeUtf8("bad json")))
+        .to(any(Request.class));
+
+    store.findByName("random-user");
+  }
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  @Test()
+  public void shouldPropagateExceptions_flavor3() throws Exception {
+    client.respond(Response.forPayload(ByteString.encodeUtf8("bad json")))
+        .to(any(Request.class));
+    thrown.expect(RuntimeException.class);
+
+    store.findByName("random-user");
+  }
 }
